@@ -19,11 +19,11 @@ return new class extends Migration
             $table->string('password');
             $table->string('phone')->unique();
             $table->string('address');
-            $table->string('website');
-            $table->dateTime('dob');
+            $table->string('website')->nullable();
+            $table->dateTime('dob', $precision = 0);
             $table->longText('objective');
-            $table->json('interests');
-            $table->string('photo');
+            $table->string('interests')->nullable();
+            $table->string('photo')->default('default.png');
             $table->rememberToken();
             $table->timestamps();
             $table->charset = 'utf8mb4';

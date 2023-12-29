@@ -1,11 +1,10 @@
 <?php
 
-use App\Http\Controllers\EducationController;
-use App\Http\Controllers\ExperienceController;
-use App\Http\Controllers\ProjectAndPublicationController;
-use App\Http\Controllers\SkillController;
+use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,8 +17,13 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::resource('users', UserController::class)->except(['destroy']);
-Route::resource('users/educations', EducationController::class);
-Route::resource('users/experiences', ExperienceController::class);
-Route::resource('users/projects-and-publications', ProjectAndPublicationController::class);
-Route::resource('users/skills', SkillController::class);
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
+Route::group(['middleware' => 'auth.role:ROLE_ADMIN,','prefix' => 'admin'], function () {
+    Route::resource('/permissions', PermissionController::class);
+    Route::resource('/roles', RoleController::class);
+    Route::post('/roles/{role}/permissions', [RoleController::class, 'givePermission'])->name('roles.permission.create');
+    Route::resource('/users', UserController::class);
+});
