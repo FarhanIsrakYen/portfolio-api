@@ -27,3 +27,7 @@ Route::group(['middleware' => 'auth.role:ROLE_ADMIN,','prefix' => 'admin'], func
     Route::post('/roles/{role}/permissions', [RoleController::class, 'givePermission'])->name('roles.permission.create');
     Route::resource('/users', UserController::class);
 });
+
+Route::group(['middleware' => 'auth.role:ROLE_USER,','prefix' => 'users'], function () {
+    Route::get('/', [\App\Http\Controllers\User\UserController::class, 'index']);
+});
