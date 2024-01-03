@@ -19,10 +19,7 @@ controller:
 	docker exec -it ${CONTAINER_PHP} php artisan make:controller ${CONTROLLER_NAME}
 
 env:
-	@if [ ! -f ".env" ]; then \
-		echo "Creating .env file."; \
-		cp .env.example .env; \
-	fi
+	cp .env.example .env
 
 destroy: down
 	@docker compose down
@@ -73,4 +70,6 @@ tests-html:
 	docker exec ${CONTAINER_PHP} php -d zend_extension=xdebug.so -d xdebug.mode=coverage ./vendor/bin/phpunit --coverage-html reports
 
 up:
+	docker exec -it ${CONTAINER_PHP} php artisan jwt:secret
+	make cache
 	@docker compose up -d --remove-orphans

@@ -30,4 +30,7 @@ Route::group(['middleware' => 'auth.role:ROLE_ADMIN,','prefix' => 'admin'], func
 
 Route::group(['middleware' => 'auth.role:ROLE_USER,','prefix' => 'users'], function () {
     Route::get('/', [\App\Http\Controllers\User\UserController::class, 'index']);
+    Route::put('/', [\App\Http\Controllers\User\UserController::class, 'update']);
+    Route::put('/update-password', [\App\Http\Controllers\User\UserController::class, 'updatePassword']);
+    Route::delete('/', [\App\Http\Controllers\User\UserController::class, 'deactivateAccount']);
 });

@@ -29,6 +29,13 @@ class AuthController extends Controller
                 'user' => $loginUserRequest->email
             ], Response::HTTP_NOT_FOUND);
         }
+        if (!$user->is_active) {
+            return response()->json([
+                'status' => Response::HTTP_UNAUTHORIZED,
+                'message' => "Account was deactivated! Please request for account reactivation",
+                'user' => $loginUserRequest->email
+            ], Response::HTTP_UNAUTHORIZED);
+        }
 
         $credentials = $loginUserRequest->only('email', 'password');
         if (!$token = JWTAuth::attempt($credentials)) {
@@ -63,7 +70,8 @@ class AuthController extends Controller
             'website' => $createUserRequest->website,
             'dob' => $createUserRequest->dob,
             'objective' => $createUserRequest->objective,
-            'interests' => $createUserRequest->interests
+            'interests' => $createUserRequest->interests,
+            'is_active' => true
         ]);
         $user->syncRoles(['user']);
         return response()->json([

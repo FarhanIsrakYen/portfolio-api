@@ -27,7 +27,7 @@ class RoleAuthorizationMiddleware
         } catch (TokenInvalidException $e) {
             return $this->unauthorized('Your token is invalid. Please, login again.');
         }catch (JWTException $e) {
-            return $this->unauthorized('Please, attach a Bearer Token to your request');
+            return $this->unauthorized('Missing bearer token');
         }
         if ($user && in_array($role, json_decode($user->roles))) {
             return $next($request);

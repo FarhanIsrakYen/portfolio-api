@@ -29,7 +29,8 @@ class User extends Authenticatable implements JWTSubject
         'website',
         'dob',
         'objective',
-        'interests'
+        'interests',
+        'is_active'
     ];
 
     /**
