@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('duration')->comment('start-end');
             $table->enum('job_type', ['on-site', 'remote']);
             $table->longText('responsibilities');
-            $table->json('technologies_used');
+            $table->string('technologies_used');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
             $table->charset = 'utf8mb4';

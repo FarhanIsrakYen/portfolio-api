@@ -15,7 +15,7 @@ class BaseController extends Controller
      * @param int|null $statusCode
      * @return JsonResponse
      */
-    public function getJsonResponse(?array $data, ?string $message, ?int $statusCode): JsonResponse
+    public function getJsonResponse(array $data = [], string $message = null, int $statusCode = null): JsonResponse
     {
         return match ($statusCode) {
             Response::HTTP_CREATED => response()->json(

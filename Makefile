@@ -1,7 +1,7 @@
 .PHONY: help ps fresh build up down destroy tests tests-html migrate \
 	migrate-fresh migrate-tests-fresh install-xdebug env
 
-default: up
+default: up jwt cache
 
 CONTAINER_PHP=app
 VOLUME_DATABASE=db
@@ -42,6 +42,9 @@ install-xdebug:
 	docker exec ${CONTAINER_PHP} pecl install xdebug
 	docker exec ${CONTAINER_PHP} /usr/local/bin/docker-php-ext-enable xdebug.so
 
+jwt:
+	docker exec -it ${CONTAINER_PHP} php artisan jwt:secret
+
 migrate:
 	docker exec ${CONTAINER_PHP} php artisan migrate
 
@@ -70,6 +73,4 @@ tests-html:
 	docker exec ${CONTAINER_PHP} php -d zend_extension=xdebug.so -d xdebug.mode=coverage ./vendor/bin/phpunit --coverage-html reports
 
 up:
-	docker exec -it ${CONTAINER_PHP} php artisan jwt:secret
-	make cache
 	@docker compose up -d --remove-orphans

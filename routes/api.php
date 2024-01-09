@@ -4,6 +4,10 @@ use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\User\EducationController;
+use App\Http\Controllers\User\ExperienceController;
+use App\Http\Controllers\User\ProjectAndPublicationController;
+use App\Http\Controllers\User\SkillController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,9 +32,20 @@ Route::group(['middleware' => 'auth.role:ROLE_ADMIN,','prefix' => 'admin'], func
     Route::resource('/users', UserController::class);
 });
 
-Route::group(['middleware' => 'auth.role:ROLE_USER,','prefix' => 'users'], function () {
-    Route::get('/', [\App\Http\Controllers\User\UserController::class, 'index']);
-    Route::put('/', [\App\Http\Controllers\User\UserController::class, 'update']);
-    Route::put('/update-password', [\App\Http\Controllers\User\UserController::class, 'updatePassword']);
-    Route::delete('/', [\App\Http\Controllers\User\UserController::class, 'deactivateAccount']);
+Route::group(['middleware' => 'auth.role:ROLE_USER,'], function () {
+    // users
+    Route::prefix('users')->group(function() {
+        Route::get('/', [\App\Http\Controllers\User\UserController::class, 'index']);
+        Route::put('/', [\App\Http\Controllers\User\UserController::class, 'update']);
+        Route::put('/update-password', [\App\Http\Controllers\User\UserController::class, 'updatePassword']);
+        Route::delete('/', [\App\Http\Controllers\User\UserController::class, 'deactivateAccount']);
+
+        // education
+        Route::apiResources([
+            'educations' => EducationController::class,
+            'experiences' => ExperienceController::class,
+            'projects' => ProjectAndPublicationController::class,
+            'skills' => SkillController::class,
+        ]);
+    });
 });
