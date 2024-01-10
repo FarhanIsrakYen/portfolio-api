@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Http\Requests;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
-class StoreExperienceDetailsRequest extends AbstractRequest
+class StoreProjectAndPublicationsRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,13 +22,15 @@ class StoreExperienceDetailsRequest extends AbstractRequest
     public function rules(): array
     {
         return [
-            'position' => ['required','max:255'],
+            'title' => [
+                'required',
+                'max:255',
+                'string',
+                Rule::unique('education', 'title')->where('user_id', Auth::user()->id)
+            ],
             'institution' => ['required','string'],
-            'startedAt' => ['required'],
-            'endedAt' => ['required'],
-            'job_type' => ['required','in:on-site,remote'],
-            'responsibilities' => ['required'],
-            'technologies_used' => ['required','array']
+            'startedAt' => ['required','integer'],
+            'endedAt' => ['required','integer']
         ];
     }
 }

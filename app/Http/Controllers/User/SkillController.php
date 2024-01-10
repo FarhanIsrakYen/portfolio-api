@@ -3,7 +3,12 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreSkillRequest;
+use App\Http\Requests\UpdateSkillRequest;
+use App\Models\Skill;
+use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class SkillController extends Controller
 {
@@ -12,31 +17,30 @@ class SkillController extends Controller
      */
     public function index()
     {
-        $education = Education::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->get();
+        $skills = Skill::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->get();
 
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
-            'message' => "User's education details retrieved successfully",
-            'data' => $education
+            'message' => "User's skills retrieved successfully",
+            'data' => $skills
         ], Response::HTTP_ACCEPTED);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreEducationDetailsRequest $storeEducatioDetailsRequest)
+    public function store(StoreSkillRequest $storeSkillRequest)
     {
-        $education = new Education;
-        $education->title = $storeEducatioDetailsRequest->title;
-        $education->institution = $storeEducatioDetailsRequest->institution;
-        $education->duration = $storeEducatioDetailsRequest->startedAt . '-' . $storeEducatioDetailsRequest->endedAt;
-        $education->user_id = Auth::user()->id;
-
-        $storeEducation = $education->Save();
+        $userSkills = [];
+        foreach ($storeSkillRequest->skills as $skill) {
+            $skill['user_id'] = Auth::user()->id;
+            $userSkills[] = $skill;
+        }
+        Skill::insert($userSkills);
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
-            'message' => "User's education details stored successfully",
-            'data' => $storeEducation
+            'message' => "User's skills stored successfully",
+            'data' => $userSkills
         ], Response::HTTP_ACCEPTED);
     }
 
@@ -45,43 +49,44 @@ class SkillController extends Controller
      */
     public function show(int $id)
     {
-        $education = Education::where('user_id', Auth::user()->id)->find($id);
-        if (empty($education)) {
-            $this->getJsonResponse();
+        $skills = Skill::where('user_id', Auth::user()->id)->find($id);
+        if (empty($skills)) {
+            return response()->json([
+                'status' => Response::HTTP_NOT_FOUND,
+                'message' => "Skill not found",
+                'data' => $id
+            ], Response::HTTP_NOT_FOUND);
         }
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
-            'message' => "User's education details retrieved successfully",
-            'data' => $education
+            'message' => "User's skill retrieved successfully",
+            'data' => $skills
         ], Response::HTTP_ACCEPTED);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEducationDetailsRequest $updateEducatioDetailsRequest, int $id)
+    public function update(UpdateSkillRequest $updateSkillRequest, int $id)
     {
-        $education = Education::where('user_id', Auth::user()->id)->find($id);
-        if (empty($education)) {
-            $this->getJsonResponse();
+        $skill = Skill::where('user_id', Auth::user()->id)->find($id);
+        if (empty($skill)) {
+            return response()->json([
+                'status' => Response::HTTP_NOT_FOUND,
+                'message' => "Skill not found",
+                'data' => $id
+            ], Response::HTTP_NOT_FOUND);
         }
 
-        $startedAt = explode('-', $education->duration)[0];
-        $endedAt = explode('-', $education->duration)[1];
-        $newStartedAt = $updateEducatioDetailsRequest->startedAt ?? $startedAt;
-        $newEndedAt = $updateEducatioDetailsRequest->endedAt ?? $endedAt;
-        $duration = $newStartedAt . '-' . $newEndedAt;
-
-        $education->update([
-            'title' => $updateEducatioDetailsRequest->title,
-            'institution' => $updateEducatioDetailsRequest->institution,
-            'duration' => $duration
+        $skill->update([
+            'topic' => empty($updateSkillRequest->topic)? $skill->topic : $updateSkillRequest->topic,
+            'percentage' => empty($updateSkillRequest->percentage)? $skill->percentage : $updateSkillRequest->percentage
         ]);
 
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
-            'message' => "Education details updated successfully",
-            'user' => $id
+            'message' => "Skill updated successfully",
+            'user' => $skill
         ], Response::HTTP_ACCEPTED);
     }
 
@@ -90,21 +95,21 @@ class SkillController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $education = Education::where('user_id', Auth::user()->id)->find($id);
+        $skill = Skill::where('user_id', Auth::user()->id)->find($id);
 
-        if (empty($education)) {
+        if (empty($skill)) {
             return response()->json([
                 'status' => Response::HTTP_NOT_FOUND,
-                'message' => "Education details not found",
+                'message' => "Skill not found",
                 'user' => $id
             ], Response::HTTP_NOT_FOUND);
         }
 
-        $education->delete();
+        $skill->delete();
 
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
-            'message' => "Education details deleted successfully",
+            'message' => "Skill deleted successfully",
             'user' => $id
         ], Response::HTTP_ACCEPTED);
     }

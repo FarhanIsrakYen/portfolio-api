@@ -14,14 +14,13 @@ return new class extends Migration
         Schema::create('project_and_publications', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('category', ['official', 'personal'])->comment('Official project or Personal project');
+            $table->enum('category', ['official', 'personal'])->comment('Official project or Personal project')->nullable();
             $table->string('duration')->comment('start-end');
             $table->string('link')->nullable();
-            $table->json('technologies_used');
+            $table->string('technologies_used');
             $table->longText('description');
             $table->string('images');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_unicode_ci';
         });

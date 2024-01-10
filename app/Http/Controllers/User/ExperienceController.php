@@ -37,7 +37,7 @@ class ExperienceController extends Controller
         $experience->duration = $storeExperienceDetailsRequest->startedAt . '-' . $storeExperienceDetailsRequest->endedAt;
         $experience->job_type = $storeExperienceDetailsRequest->job_type;
         $experience->responsibilities = $storeExperienceDetailsRequest->responsibilities;
-        $experience->technologies_used = json_encode($storeExperienceDetailsRequest->technologies_used);
+        $experience->technologies_used = implode(',', $storeExperienceDetailsRequest->technologies_used);
         $experience->user_id = Auth::user()->id;
 
         $storeExperience = $experience->Save();

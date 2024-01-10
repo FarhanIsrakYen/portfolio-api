@@ -20,7 +20,6 @@ return new class extends Migration
             $table->longText('responsibilities');
             $table->string('technologies_used');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_unicode_ci';
         });

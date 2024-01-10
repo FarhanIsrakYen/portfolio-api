@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('duration', 100)->comment('start-end');
             $table->string('institution', 100);
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_unicode_ci';
         });

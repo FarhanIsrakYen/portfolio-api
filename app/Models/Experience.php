@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Experience extends Model
 {
     use HasFactory;
+    public $timestamps = false;
 
     protected $fillable = [
         'position',
