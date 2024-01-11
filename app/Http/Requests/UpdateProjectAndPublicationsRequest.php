@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-class StoreEducationDetailsRequest extends AbstractRequest
+class UpdateProjectAndPublicationsRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,15 +22,13 @@ class StoreEducationDetailsRequest extends AbstractRequest
     public function rules(): array
     {
         return [
-            'title' => [
-                'required',
-                'max:255',
-                'string',
-                Rule::unique('education', 'title')->where('user_id', Auth::user()->id)
-            ],
-            'institution' => ['required','string'],
-            'startedAt' => ['required','string'],
-            'endedAt' => ['required','string']
+            'name' => ['max:255','string'],
+            'category' => ['in:official,personal'],
+            'startedAt' => ['string'],
+            'endedAt' => ['string'],
+            'link' => ['string'],
+            'technologies_used' => ['array'],
+            'images' => ['array'],
         ];
     }
 }

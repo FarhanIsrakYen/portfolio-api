@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('topic');
             $table->double('percentage');
+            $table->string('rename_as')->nullable();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->charset = 'utf8mb4';
             $table->collation = 'utf8mb4_unicode_ci';

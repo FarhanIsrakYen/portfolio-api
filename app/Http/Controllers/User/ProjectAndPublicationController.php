@@ -3,7 +3,12 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreProjectAndPublicationsRequest;
+use App\Http\Requests\UpdateProjectAndPublicationsRequest;
+use App\Models\ProjectAndPublication;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ProjectAndPublicationController extends Controller
 {
@@ -12,31 +17,35 @@ class ProjectAndPublicationController extends Controller
      */
     public function index()
     {
-        $education = Education::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->get();
+        $project = ProjectAndPublication::where('user_id', Auth::user()->id)->orderBy('id', 'desc')->get();
 
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
-            'message' => "User's education details retrieved successfully",
-            'data' => $education
+            'message' => "User's projects details retrieved successfully",
+            'data' => $project
         ], Response::HTTP_ACCEPTED);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreEducationDetailsRequest $storeEducatioDetailsRequest)
+    public function store(StoreProjectAndPublicationsRequest $storeProjectAndPublicationsRequest)
     {
-        $education = new Education;
-        $education->title = $storeEducatioDetailsRequest->title;
-        $education->institution = $storeEducatioDetailsRequest->institution;
-        $education->duration = $storeEducatioDetailsRequest->startedAt . '-' . $storeEducatioDetailsRequest->endedAt;
-        $education->user_id = Auth::user()->id;
+        $project = new ProjectAndPublication;
+        $project->name = $storeProjectAndPublicationsRequest->name;
+        $project->category = $storeProjectAndPublicationsRequest->category;
+        $project->duration = $storeProjectAndPublicationsRequest->startedAt . '-' . $storeProjectAndPublicationsRequest->endedAt;
+        $project->link = $storeProjectAndPublicationsRequest->link;
+        $project->description = $storeProjectAndPublicationsRequest->description;
+        $project->technologies_used = implode(',', $storeProjectAndPublicationsRequest->technologies_used);
+        $project->images = implode(',', $storeProjectAndPublicationsRequest->images);
+        $project->user_id = Auth::user()->id;
 
-        $storeEducation = $education->Save();
+        $storeProject = $project->Save();
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
-            'message' => "User's education details stored successfully",
-            'data' => $storeEducation
+            'message' => "User's project details stored successfully",
+            'data' => $storeProject
         ], Response::HTTP_ACCEPTED);
     }
 
@@ -45,42 +54,60 @@ class ProjectAndPublicationController extends Controller
      */
     public function show(int $id)
     {
-        $education = Education::where('user_id', Auth::user()->id)->find($id);
-        if (empty($education)) {
-            $this->getJsonResponse();
+        $project = ProjectAndPublication::where('user_id', Auth::user()->id)->find($id);
+        if (empty($project)) {
+            return response()->json([
+                'status' => Response::HTTP_NOT_FOUND,
+                'message' => "Project details not found",
+                'user' => $id
+            ], Response::HTTP_NOT_FOUND);
         }
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
-            'message' => "User's education details retrieved successfully",
-            'data' => $education
+            'message' => "User's project details retrieved successfully",
+            'data' => $project
         ], Response::HTTP_ACCEPTED);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEducationDetailsRequest $updateEducatioDetailsRequest, int $id)
+    public function update(UpdateProjectAndPublicationsRequest $updateProjectAndPublicationsRequest, int $id)
     {
-        $education = Education::where('user_id', Auth::user()->id)->find($id);
-        if (empty($education)) {
-            $this->getJsonResponse();
+        $project = ProjectAndPublication::where('user_id', Auth::user()->id)->find($id);
+        if (empty($project)) {
+            return response()->json([
+                'status' => Response::HTTP_NOT_FOUND,
+                'message' => "Project details not found",
+                'user' => $id
+            ], Response::HTTP_NOT_FOUND);
         }
 
-        $startedAt = explode('-', $education->duration)[0];
-        $endedAt = explode('-', $education->duration)[1];
-        $newStartedAt = $updateEducatioDetailsRequest->startedAt ?? $startedAt;
-        $newEndedAt = $updateEducatioDetailsRequest->endedAt ?? $endedAt;
+        $startedAt = explode('-', $project->duration)[0];
+        $endedAt = explode('-', $project->duration)[1];
+        $newStartedAt = $updateProjectAndPublicationsRequest->startedAt ?? $startedAt;
+        $newEndedAt = $updateProjectAndPublicationsRequest->endedAt ?? $endedAt;
         $duration = $newStartedAt . '-' . $newEndedAt;
 
-        $education->update([
-            'title' => $updateEducatioDetailsRequest->title,
-            'institution' => $updateEducatioDetailsRequest->institution,
+        $techUsed = !empty($updateProjectAndPublicationsRequest->technologies_used)?
+            implode(',', $updateProjectAndPublicationsRequest->technologies_used) : $project->technologies_used;
+
+        $images = !empty($updateProjectAndPublicationsRequest->images)?
+            implode(',', $updateProjectAndPublicationsRequest->images) : $project->images;
+
+        $project->update([
+            'name' => !empty($updateProjectAndPublicationsRequest->name)? $updateProjectAndPublicationsRequest->name: $project->name,
+            'category' => !empty($updateProjectAndPublicationsRequest->category)? $updateProjectAndPublicationsRequest->category: $project->category,
+            'link' => !empty($updateProjectAndPublicationsRequest->link)? $updateProjectAndPublicationsRequest->link: $project->link,
+            'description' => !empty($updateProjectAndPublicationsRequest->description)? $updateProjectAndPublicationsRequest->description: $project->description,
+            'technologies_used' => $techUsed,
+            'images' => $images,
             'duration' => $duration
         ]);
 
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
-            'message' => "Education details updated successfully",
+            'message' => "Project details updated successfully",
             'user' => $id
         ], Response::HTTP_ACCEPTED);
     }
@@ -90,21 +117,21 @@ class ProjectAndPublicationController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $education = Education::where('user_id', Auth::user()->id)->find($id);
+        $project = ProjectAndPublication::where('user_id', Auth::user()->id)->find($id);
 
-        if (empty($education)) {
+        if (empty($project)) {
             return response()->json([
                 'status' => Response::HTTP_NOT_FOUND,
-                'message' => "Education details not found",
+                'message' => "Project details not found",
                 'user' => $id
             ], Response::HTTP_NOT_FOUND);
         }
 
-        $education->delete();
+        $project->delete();
 
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
-            'message' => "Education details deleted successfully",
+            'message' => "Project details deleted successfully",
             'user' => $id
         ], Response::HTTP_ACCEPTED);
     }

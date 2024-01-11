@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\User\EducationController;
 use App\Http\Controllers\User\ExperienceController;
 use App\Http\Controllers\User\ProjectAndPublicationController;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::get('/portfolio', [PortfolioController::class, 'index']);
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('/register', [AuthController::class, 'register']);

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Validation\Rule;
 
 class CreateUserRequest extends CustomFormRequest
 {
@@ -24,6 +25,13 @@ class CreateUserRequest extends CustomFormRequest
         return [
             'name' => ['required','max:255'],
             'email' => ['required','max:255', 'unique:users,email','email:filter'],
+            'username' => [
+                'required',
+                'max:255',
+                'regex:/^[a-zA-Z0-9_-]+$/',
+                Rule::notIn(['_', '-']),
+                'unique:users,username'
+            ],
             'password' => ['required','min:8'],
             'phone' => ['required','max:255', 'unique:users'],
             'address' => ['required','max:255'],

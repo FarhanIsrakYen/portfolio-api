@@ -17,6 +17,7 @@ return new class extends Migration
             $table->enum('category', ['official', 'personal'])->comment('Official project or Personal project')->nullable();
             $table->string('duration')->comment('start-end');
             $table->string('link')->nullable();
+            $table->string('rename_as')->nullable();
             $table->string('technologies_used');
             $table->longText('description');
             $table->string('images');

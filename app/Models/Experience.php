@@ -18,4 +18,8 @@ class Experience extends Model
         'responsibilities',
         'technologies_used'
     ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }

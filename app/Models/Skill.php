@@ -14,4 +14,8 @@ class Skill extends Model
         'topic',
         'percentage'
     ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }

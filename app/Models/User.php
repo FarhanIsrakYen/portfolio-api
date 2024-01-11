@@ -22,6 +22,7 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'name',
         'email',
+        'username',
         'password',
         'phone',
         'roles',
@@ -60,5 +61,21 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function education() {
+        return $this->hasMany(Education::class,'user_id','id');
+    }
+
+    public function skills() {
+        return $this->hasMany(Skill::class,'user_id','id');
+    }
+
+    public function experience() {
+        return $this->hasMany(Experience::class,'user_id','id');
+    }
+
+    public function projects() {
+        return $this->hasMany(ProjectAndPublication::class,'user_id','id');
     }
 }

@@ -1,8 +1,6 @@
 <?php
 
 namespace App\Http\Requests;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
 class StoreProjectAndPublicationsRequest extends AbstractRequest
 {
@@ -22,15 +20,14 @@ class StoreProjectAndPublicationsRequest extends AbstractRequest
     public function rules(): array
     {
         return [
-            'title' => [
-                'required',
-                'max:255',
-                'string',
-                Rule::unique('education', 'title')->where('user_id', Auth::user()->id)
-            ],
-            'institution' => ['required','string'],
-            'startedAt' => ['required','integer'],
-            'endedAt' => ['required','integer']
+            'name' => ['required','max:255','string'],
+            'category' => ['required','in:official,personal'],
+            'startedAt' => ['required','string'],
+            'endedAt' => ['required','string'],
+            'link' => ['required','string'],
+            'technologies_used' => ['required','array'],
+            'description' => ['required'],
+            'images' => ['required','array'],
         ];
     }
 }

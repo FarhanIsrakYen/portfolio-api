@@ -22,8 +22,8 @@ class StoreExperienceDetailsRequest extends AbstractRequest
         return [
             'position' => ['required','max:255'],
             'institution' => ['required','string'],
-            'startedAt' => ['required'],
-            'endedAt' => ['required'],
+            'startedAt' => ['required','string'],
+            'endedAt' => ['required','string'],
             'job_type' => ['required','in:on-site,remote'],
             'responsibilities' => ['required'],
             'technologies_used' => ['required','array']

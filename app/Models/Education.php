@@ -15,4 +15,8 @@ class Education extends Model
         'institution',
         'duration'
     ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }

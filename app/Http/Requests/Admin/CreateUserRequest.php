@@ -4,6 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateUserRequest extends FormRequest
 {
@@ -25,6 +26,13 @@ class CreateUserRequest extends FormRequest
         return [
             'name' => ['required','max:255'],
             'email' => ['required','max:255', 'unique:users,email','email:filter'],
+            'username' => [
+                'required',
+                'max:255',
+                'regex:/^[a-zA-Z0-9_-]+$/',
+                Rule::notIn(['_', '-']),
+                'unique:users,username'
+            ],
             'password' => ['required','min:8'],
             'phone' => ['required','max:255', 'unique:users'],
             'address' => ['required','max:255'],
