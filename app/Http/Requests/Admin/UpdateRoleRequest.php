@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Requests\AbstractRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateRoleRequest extends FormRequest
+class UpdateRoleRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\User\ExtraInfoController;
+use App\Http\Controllers\User\ImageController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\User\EducationController;
 use App\Http\Controllers\User\ExperienceController;
@@ -22,7 +24,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/portfolio', [PortfolioController::class, 'index']);
+Route::get('/images/{image}', [ImageController::class, 'index']);
 
 Route::group(['prefix' => 'auth'], function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -43,12 +45,13 @@ Route::group(['middleware' => 'auth.role:ROLE_USER,'], function () {
         Route::put('/update-password', [\App\Http\Controllers\User\UserController::class, 'updatePassword']);
         Route::delete('/', [\App\Http\Controllers\User\UserController::class, 'deactivateAccount']);
 
-        // education
         Route::apiResources([
             'educations' => EducationController::class,
             'experiences' => ExperienceController::class,
             'projects' => ProjectAndPublicationController::class,
             'skills' => SkillController::class,
+            'extras' => ExtraInfoController::class,
         ]);
+        Route::apiResource('images', ImageController::class)->except(['index','show','update']);
     });
 });

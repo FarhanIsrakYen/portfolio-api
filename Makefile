@@ -9,11 +9,14 @@ REQUEST_NAME=default
 CONTROLLER_NAME=default
 MODEL_NAME=default
 
-build: env
+build: composer env
 	@docker compose up -d --build --remove-orphans && make migrate && make generate-key && make cache
 
 cache:
 	docker exec -it ${CONTAINER_PHP} php artisan optimize
+
+composer:
+	docker exec -it ${CONTAINER_PHP} bash -c "composer install"
 
 controller:
 	docker exec -it ${CONTAINER_PHP} php artisan make:controller ${CONTROLLER_NAME}

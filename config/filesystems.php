@@ -56,6 +56,11 @@ return [
             'throw' => false,
         ],
 
+        'google_drive' => [
+            'service_account' => env('GOOGLE_DRIVE_SERVICE_ACCOUNT'),
+            'folder' => env('GOOGLE_DRIVE_FOLDER_ID'),
+        ],
+
     ],
 
     /*

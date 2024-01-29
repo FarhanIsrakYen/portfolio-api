@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers\EncryptionHelper;
+use App\Http\Resources\UserResource;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\LoginUserRequest;
@@ -50,7 +52,7 @@ class AuthController extends Controller
             'access_token' => $token,
             'status' => Response::HTTP_OK,
             'message' => 'Logged in successfully',
-            'data' => $user
+            'data' => new UserResource($user)
         ], Response::HTTP_OK);
     }
 
@@ -72,13 +74,14 @@ class AuthController extends Controller
             'dob' => $createUserRequest->dob,
             'objective' => $createUserRequest->objective,
             'interests' => $createUserRequest->interests,
-            'is_active' => true
+            'is_active' => true,
+            'secret_key' => EncryptionHelper::generateKey(80)
         ]);
         $user->syncRoles(['user']);
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
             'message' => "Signed up successfully",
-            'user' => $user
+            'user' => new UserResource($user)
         ], Response::HTTP_ACCEPTED);
     }
 }

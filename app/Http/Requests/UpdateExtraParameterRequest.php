@@ -1,11 +1,8 @@
 <?php
 
-namespace App\Http\Requests\Admin;
+namespace App\Http\Requests;
 
-use App\Http\Requests\AbstractRequest;
-use Illuminate\Contracts\Validation\ValidationRule;
-
-class UpdatePermissionRequest extends AbstractRequest
+class UpdateExtraParameterRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -18,12 +15,12 @@ class UpdatePermissionRequest extends AbstractRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'name' => ['required','max:255']
+            'parameter_name' => ['max:255','string']
         ];
     }
 }

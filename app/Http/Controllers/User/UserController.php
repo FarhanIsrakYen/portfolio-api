@@ -5,7 +5,9 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
+use Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -21,7 +23,7 @@ class UserController extends Controller
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
             'message' => "User retrieved successfully",
-            'user' => $user
+            'user' => new UserResource($user)
         ], Response::HTTP_ACCEPTED);
     }
 
@@ -45,7 +47,7 @@ class UserController extends Controller
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
             'message' => "User updated successfully",
-            'user' => Auth::user()
+            'user' => new UserResource($user)
         ], Response::HTTP_ACCEPTED);
     }
 
@@ -63,7 +65,7 @@ class UserController extends Controller
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
             'message' => "Password updated successfully",
-            'user' => Auth::user()
+            'user' => new UserResource($user)
         ], Response::HTTP_ACCEPTED);
     }
 
@@ -81,7 +83,7 @@ class UserController extends Controller
         return response()->json([
             'status' => Response::HTTP_ACCEPTED,
             'message' => "Account deactivated successfully",
-            'user' => Auth::user()
+            'user' => new UserResource($user)
         ], Response::HTTP_ACCEPTED);
     }
 }

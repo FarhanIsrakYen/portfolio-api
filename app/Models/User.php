@@ -31,7 +31,8 @@ class User extends Authenticatable implements JWTSubject
         'dob',
         'objective',
         'interests',
-        'is_active'
+        'is_active',
+        'secret_key'
     ];
 
     /**
@@ -77,5 +78,9 @@ class User extends Authenticatable implements JWTSubject
 
     public function projects() {
         return $this->hasMany(ProjectAndPublication::class,'user_id','id');
+    }
+
+    public function extras() {
+        return $this->hasMany(ExtraParam::class,'user_id','id');
     }
 }

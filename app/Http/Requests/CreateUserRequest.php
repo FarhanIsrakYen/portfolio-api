@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 
-class CreateUserRequest extends CustomFormRequest
+class CreateUserRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.

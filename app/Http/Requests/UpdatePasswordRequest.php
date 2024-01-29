@@ -2,14 +2,13 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Validation\Validator;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdatePasswordRequest extends FormRequest
+class UpdatePasswordRequest extends AbstractRequest
 {
     /**
      * Determine if the user is authorized to make this request.
