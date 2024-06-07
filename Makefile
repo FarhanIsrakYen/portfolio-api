@@ -1,79 +1,67 @@
-.PHONY: help ps fresh build up down destroy tests tests-html migrate \
-	migrate-fresh migrate-tests-fresh install-xdebug env
+default: up migrate
 
-default: up jwt cache
 
-CONTAINER_PHP=app
-VOLUME_DATABASE=db
-REQUEST_NAME=default
-CONTROLLER_NAME=default
-MODEL_NAME=default
+build: down docker
+	cp ./src/.env.example ./src/.env
+	docker compose -f docker/docker-compose.yml build --no-cache
+	docker compose -f docker/docker-compose.yml up -d
+	docker exec php /bin/sh -c "composer install && npm install && chmod -R 777 storage && php artisan key:generate"
 
-build: composer env
-	@docker compose up -d --build --remove-orphans && make migrate && make generate-key && make cache
+code-format-check:
+	docker exec php /bin/sh -c "npm run format:check"
 
-cache:
-	docker exec -it ${CONTAINER_PHP} php artisan optimize
+code-format:
+	docker exec php /bin/sh -c "npm run format"
 
-composer:
-	docker exec -it ${CONTAINER_PHP} bash -c "composer install"
+docker:
+	rm -rf docker > /dev/null 2>&1
+	git clone --single-branch --branch main git@github.com:FarhanIsrakYen/api.docker.git
+	rm -rf docker/ > /dev/null 2>&1
+	mkdir -p docker/
+	cp -R api.docker/. docker/
+	rm -rf api.docker > /dev/null 2>&1
+	make owner
+	rm -rf .env > /dev/null 2>&1
+	cat src/.env.example >> docker/.env
 
-controller:
-	docker exec -it ${CONTAINER_PHP} php artisan make:controller ${CONTROLLER_NAME}
+down:
+	docker ps -a -q | xargs -n 1 -P 8 -I {} docker stop {}
+	docker builder prune --all --force
+	docker system prune -f
 
-env:
-	cp .env.example .env
+flush-db:
+	docker exec php /bin/sh -c "php artisan migrate:fresh"
 
-destroy: down
-	@docker compose down
-	@if [ "$(shell docker volume ls --filter name=${VOLUME_DATABASE} --format {{.Name}})" ]; then \
-		docker volume rm ${VOLUME_DATABASE}; \
-	fi
+flush-db-with-seeding:
+	docker exec php /bin/sh -c "php artisan migrate:fresh --seed"
 
-down: env
-	@docker compose down
-
-fresh: down destroy build up
-
-generate-key:
-	docker exec ${CONTAINER_PHP} php artisan key:generate
-
-help:
-	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-
-install-xdebug:
-	docker exec ${CONTAINER_PHP} pecl install xdebug
-	docker exec ${CONTAINER_PHP} /usr/local/bin/docker-php-ext-enable xdebug.so
-
-jwt:
-	docker exec -it ${CONTAINER_PHP} php artisan jwt:secret
-
-migrate:
-	docker exec ${CONTAINER_PHP} php artisan migrate
-
-migrate-fresh:
-	docker exec ${CONTAINER_PHP} php artisan migrate:fresh
-
-model:
-	docker exec -it ${CONTAINER_PHP} php artisan make:model ${MODEL_NAME} --mc
-
-ps:
-	@docker compose ps
-
-request:
-	docker exec -it ${CONTAINER_PHP} php artisan make:request ${REQUEST_NAME}
-
-show-model-details:
-	docker exec -it ${CONTAINER_PHP} php artisan model:show ${MODEL_NAME}
+kill-app:
+	docker compose down
 
 ssh:
-	docker exec -it ${CONTAINER_PHP} sh
+	docker exec -it php /bin/sh
 
-tests:
-	docker exec ${CONTAINER_PHP} ./vendor/bin/phpunit
+migrate:
+	sleep 5
+	docker exec php /bin/sh -c "php artisan migrate"
 
-tests-html:
-	docker exec ${CONTAINER_PHP} php -d zend_extension=xdebug.so -d xdebug.mode=coverage ./vendor/bin/phpunit --coverage-html reports
+mysql:
+	docker exec -it mysql /bin/sh
+
+owner:
+    # docker
+	chmod -R 777 docker
+	# website var
+	for d in $$(ls ../); do \
+	chown -R www-data:www-data ../$$d \
+	&& mkdir -p ../$$d/var/cache/$(APP_ENV)/ \
+	&& mkdir -p ../$$d/var/log/ \
+	&& touch ../$$d/var/log/$(APP_ENV).log \
+	&& chmod 777 -R ../$$d/var/ \
+	; done
+
+test:
+	docker exec php /bin/sh -c "php artisan test"
 
 up:
-	@docker compose up -d --remove-orphans
+	docker compose -f docker/docker-compose.yml up -d
