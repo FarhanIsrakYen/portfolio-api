@@ -34,10 +34,7 @@ class CreateUserRequest extends AbstractRequest
             ],
             'password' => ['required','min:8'],
             'phone' => ['required','max:255', 'unique:users'],
-            'address' => ['required','max:255'],
-            'website' => ['max:255'],
-            'dob' => ['required','max:255'],
-            'objective' => ['required']
+            'address' => ['required','max:255']
         ];
     }
 }
